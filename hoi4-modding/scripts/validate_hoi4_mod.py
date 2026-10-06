@@ -95,7 +95,7 @@ def check_events(mod_root: Path) -> list[str]:
             problems.append(f"{f.name}: 缺少 add_namespace（必须在事件块外）")
             continue
         ns = nss[0]
-        for m in re.finditer(r"^\s*id = (\w+)", t, re.M):
+        for m in re.finditer(r"^\s*id = ([\w.]+)", t, re.M):
             eid = m.group(1)
             # 事件 id 是出现在 event 块内的（id 行前应有 country_event/news_event 等）
             if re.match(rf"^{re.escape(ns)}\.\d+$", eid):
