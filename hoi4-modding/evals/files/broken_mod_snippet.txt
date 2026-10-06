@@ -1,0 +1,117 @@
+# ============================================================
+# nanzhao 模组代码片段（故意混合了多个典型 bug，请全部找出并修复）
+# 目标版本：HOI4 1.16
+# 症状：国策树中 NAN_RAILWAY 永远不可用；事件会在随机时间
+#       意外触发；decisions 完全不加载；游戏里显示裸 key；
+#       error.log 有 malformed token。
+# ============================================================
+
+# ------------- 文件1: common/national_focus/nanzhao_focus.txt -------------
+focus_tree = {
+    id = nanzhao_focus
+    country = {
+        factor = 0
+        modifier = {
+            add = 20
+            original_tag = NAN
+        }
+    }
+
+    default_focus = { id = NAN_DEVELOPMENT }
+
+    focus = {
+        id = NAN_DEVELOPMENT
+        icon = GFX_focus_nanzhao_dev
+        x = 0
+        y = 0
+        cost = 10
+        completion_reward = {
+            political_power = 150
+        }
+    }
+
+    focus = {
+        id = NAN_RAILWAY
+        icon = GFX_focus_nanzhao_railway
+        x = 1
+        y = 0
+        cost = 10
+        prerequisites = { NAN_INDUSTRY }
+        completion_reward = {
+            add_ideas = NAN_RAILWAY_SPIRIT
+        }
+    }
+
+    focus = {
+        id = NAN_COMMIE
+        icon = GFX_focus_nanzhao_commie
+        x = 0
+        y = 2
+        cost = 10
+        prerequisites = { NAN_DEVELOPMENT }
+        completion_reward = {
+            add_ideas = nanzhao_communist_influence
+            set_political_power = 50
+        }
+    }
+}
+
+# ------------- 文件2: common/ideas/nanzhao_ideas.txt -------------
+ideas = {
+    nanzhao_spirits = {
+        nanzhao_railway_spirit = {
+            name = nanzhao_railway_spirit
+            modifiers = {
+                infrastructure_construction_speed = 0.10
+            }
+        }
+        communists_influence = {
+            name = communists_influence
+            modifiers = {
+                communism_drift = 0.05
+            }
+        }
+    }
+}
+
+# ------------- 文件3: events/nanzhao_events.txt -------------
+country_event = {
+    id = nanzhao.railway_done
+    title = nanzhao.1.t
+    desc = nanzhao.1.d
+    mean_time_to_happen = {
+        days = 30
+    }
+    option = {
+        name = nanzhao.1.a
+        add_war_support = 0.1
+    }
+}
+
+# ------------- 文件4: common/decisions/nanzhao_decisions.txt -------------
+nanzhao_category = {
+    nanzhao_decision = {
+        icon = nanzhao_icon
+        allowed = { original_tag = NAN }
+        visible = {
+            has_war = yes
+        available = {
+            has_idea = nanzhao_railway_spirit
+        }
+        complete_effect = {
+            add_stability = 0.1
+            country_event = { id = nanzhao.5 days = 1 }
+        }
+        ai_will_do = { factor = 10 }
+    }
+}
+
+# ------------- 文件5: history/states/750-nanzhao.txt -------------
+state = {
+    id = 750
+    name = "NANZHAO"
+    history = {
+        owner = NAN
+        provine = { id = 750 }
+    }
+}

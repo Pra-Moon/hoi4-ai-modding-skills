@@ -1,0 +1,55 @@
+{
+  "skill_name": "hoi4-modding",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我在制作一个 HOI4 1.16 版本的模组，想添加一个新国家『南诏』（占据云南地区，首都设在大理，核心省份可选用 750-760 区间的真实省份 ID）。请帮我从零搭建一套完整可加载的模组文件：descriptor 文件（descriptor.mod + .mod）、省份/国家历史文件、一套含 6 个焦点的国策树（三个分支：『巩固滇南』经济线、『联英抗法』外交线、『红色之路』政治线，其中外交线与政治线互斥）、触发内战的 2 个事件事件链（含一个隐藏事件 + 一条新闻事件），以及配套的英文 + 中文 localisation。所有代码必须符合 1.15+ 最新语法（注意 characters 角色系统、scripted effects 等新特性），文件结构要清晰，让玩家能直接把整个文件夹放进 mod 目录加载。",
+      "expected_output": "完整可加载的南诏模组：目录结构说明 + descriptor 文件 + national_focus 国策树（≥6 焦点、含 mutually_exclusive 互斥线）+ events 事件链（含 hidden event 和 news event）+ history 国家/省份文件 + ideas 国策精神 + 中英双语 localisation，全部语法正确、key 相互引用一致。",
+      "files": [],
+      "expectations": [
+        "输出包含 descriptor.mod / .mod 文件，含 name 与 supported_version 字段",
+        "输出包含完整 national_focus 文件，焦点数量不少于 6 个",
+        "国策树包含互斥焦点（mutually_exclusive）且两条分支可被识别",
+        "焦点通过 prerequisites 引用其它焦点，且所有被引用的焦点 ID 都定义在同一国策树文件中",
+        "事件文件包含 namespace 声明，所有事件 ID 以该命名空间为前缀",
+        "事件链包含 hidden effect 或隐藏事件，以及一条 news_event",
+        "输出包含 history/countries 国家历史文件，定义了 tag、capital、oob 或 diplomacy 之一",
+        "输出包含 localisation 文件，格式为 key:0 \"text\"，且每个焦点/事件 ID 都有对应翻译条目",
+        "代码中未出现 TODO/占位符 或明显未完成的块",
+        "输出包含目录结构说明，指明文件应放置的 mod 子目录"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "帮我给我的 HOI4 1.16 模组中的『中华民国』（CHI）添加一个决议类别『西南大开发』：包含 3 个决议——『修筑滇缅铁路』（完成后基建 +2，并触发一个事件决定后续剧情）、『开采个旧锡矿』（完成后钨/铬资源增加，且当国家拥有国策精神『矿工短缺』时 AI 权重显著降低）、『移民边地』（完成后获得人口相关 modifiers）。每个决议都要有合理的 available / visible / complete_effect / ai_will_do。触发的事件请使用 scripted effect 抽取公共逻辑，避免重复代码。并补充中英双语 localisation 与必要的国策精神（national spirit）定义。",
+      "expected_output": "西南大开发决议模块：decisions 分类 + 3 个决议 + 触发事件（≥2）+ scripted effect + 国策精神定义 + 中英双语 localisation，所有块语法正确、引用一致。",
+      "files": [],
+      "expectations": [
+        "输出包含 decisions 文件，定义了 decisons_categories 和至少 3 个决议",
+        "每个决议包含 available、visible、complete_effect、ai_will_do 四个块",
+        "输出包含至少一个 scripted effect 定义，且事件或决议中实际调用它",
+        "决议的 complete_effect 能触发事件（country_event/trigger_event 等）",
+        "输出包含 ideas 文件定义国策精神，且被事件、决议或 scripted effect 引用",
+        "『开采个旧锡矿』的 ai_will_do 或 available 中引用了『矿工短缺』精神（has_idea 类判断）",
+        "输出包含 localisation 文件，每个决议/事件/精神的 key 都有中英双语条目",
+        "所有被引用的 key（decisions/events/ideas/focus）在输出文件中均有一致定义"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "下面是我 1.16 版本模组里的代码。游戏报错：国策树中的某些焦点永远不可用、一个事件会在随机时间意外触发、localisation 在游戏里显示成 key 原文、加载时 document.txt 里出现 error。请逐行检查这些代码，找出并修复所有错误（注意：我故意把几个典型的 bug 混进去了，比如拼写、括号、引用缺失、命名空间、localisation key 不一致等），然后输出修复后的完整正确文件，并逐条解释每个错误的原因。输入文件在 evals/files/broken_mod_snippet.txt。",
+      "expected_output": "逐错误的诊断列表（每个 bug 的原因 + 修复）+ 修复后的完整正确代码（focus 树、事件、决议、ideas、localisation），修复版代码经人工检查无语法错误且引用闭合。",
+      "files": ["evals/files/broken_mod_snippet.txt"],
+      "expectations": [
+        "识别出输入文件中植入的全部（至少 9/11 个）bug",
+        "每个发现的 bug 都附有原因解释",
+        "输出修复后的国策树文件，所有 prerequisites 引用的焦点 ID 均存在",
+        "输出修复后的事件文件：使用 namespace、所有事件 is_triggered_only 设置正确（不会随机触发）",
+        "输出修复后 localisation：key 与实际代码中的 id 完全一致，格式为 key:0 \"text\"",
+        "修复后的代码所有大括号/引号配对正确（可被解析）",
+        "修复了 province 拼写错误（如果出现）",
+        "修复后的 add_ideas 引用的 idea 均在 ideas 文件中定义"
+      ]
+    }
+  ]
+}
